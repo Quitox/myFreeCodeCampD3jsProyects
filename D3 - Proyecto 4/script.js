@@ -13,7 +13,9 @@
  * Variables Globales
 ***************************************************/
 
-const url = "./dataMock.json" || "https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/master/global-temperature.json";
+const urlCounties = "./dataCountiesMock.json" || "https://cdn.freecodecamp.org/testable-projects-fcc/data/choropleth_map/counties.json";
+
+const urlEducation = "./dataEducationMock.json" || "https://cdn.freecodecamp.org/testable-projects-fcc/data/choropleth_map/for_user_education.json";
 
 let datos, svg, tooltip;
 let xScale, yScale, colorScaleDiscreto;
@@ -22,18 +24,91 @@ let tempBase
 /**************************************************
  * Data - Monk
 ***************************************************/
-/* {
-//     "baseTemperature": 8.66,
-//     "monthlyVariance": [
-//         {
-//         "year": 1753,
-//         "month": 1,
-//         "variance": -1.366
-//         },
-//         ...
-//     ]
-// }
+
+/* urlEducation
+    {
+       {
+        "fips": 1001,
+        "state": "AL",
+        "area_name": "Autauga County",
+        "bachelorsOrHigher": 21.9
+        },
+        ...
+    }
 */
+
+/*urlCounties
+{
+    "type": "Topology",
+    objects : {
+        counties: {
+            "type": "GeometryCollection",
+            "geometries": [
+                {
+                    "type": "Polygon",
+                    "id": 5089,
+                    "arcs": [
+                        [
+                            0,
+                            1,
+                            2,
+                            3,
+                            4
+                        ]
+                    ]
+                },
+        }
+        states:{
+            "type": "GeometryCollection",
+            "geometries": [
+                {
+                    "type": "MultiPolygon",
+                    "arcs": [
+                        [
+                            [
+                                2311,
+                                ...,
+                                -2375
+                            ]
+                        ]
+                    ],
+                    "id": "05"
+                },
+        }
+        nation: {
+            "type": "GeometryCollection",
+            "geometries": [
+                {
+                    "type": "MultiPolygon",
+                    "arcs": [
+                        [
+                            [
+                                9206,
+                                ...,
+                                864
+                            ]   
+                        ],
+                        ...,
+                    ]
+                }   
+            ]
+        }
+    },
+    arcs:[],
+    bbox:[],
+    "transform": {
+        "scale": [
+            0.009995801851947097,
+            0.005844667153098606
+        ],
+        "translate": [
+            -56.77775821661018,
+            12.469025989284091
+        ]
+    }
+}
+*/
+
 
 let globales = {
     // Specify the chart’s dimensions.
