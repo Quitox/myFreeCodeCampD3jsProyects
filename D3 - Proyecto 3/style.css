@@ -23,6 +23,9 @@ h1 {
   position: relative;
 }
 /* ---------------------------------------------------- */
+#grafico-contenedor {
+  position: relative;
+}
 #grafico-svg {
   color: blue;
   overflow-y: scroll;
@@ -53,19 +56,28 @@ h1 {
 }
 
 #tooltip {
-  position: relative;
-  background-color: red;
-  /* top: -100px; */
+  position: absolute;
+  /* background-color: red; */
+  color: #fff;
+  font-size: 12px;
+  text-align: center;
   min-width: 8rem;
   min-height: 3rem;
-  /* text-align: center; */
-  /* padding: 0.2rem 0; */
+
+  width: auto;
+  height: auto;
+
   padding: 5px;
   border-radius: 5px;
   box-shadow: 1px 1px 5px rgb(53, 53, 100);
-  /* .style("border", "solid") */
-  /* .style("border-width", "2px") */
-  /* .style("border-radius", "5px"); */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+
+  transition: opacity 200ms;
+  opacity: 0;
 }
 #legend {
   fill: none;

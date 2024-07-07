@@ -12,10 +12,11 @@
 /**************************************************
  * Variables Globales
 ***************************************************/
+const lista = document.querySelector("section#datos > ol");
 
 const url = "./dataMock.json" || "https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/master/global-temperature.json";
 
-let datos, svg, tooltip;
+let datos, svg;
 let xScale, yScale, colorScaleDiscreto;
 let tempBase
 
@@ -39,9 +40,9 @@ let globales = {
     // Specify the chart’s dimensions.
     width: 900 / 1.2,
     height: 500 / 1.2,
-    marginTop: 40,
-    marginRight: 0,
-    marginBottom: 60,
+    marginTop: 10,
+    marginRight: 10,
+    marginBottom: 30,
     marginLeft: 60,
 
     cantidad: 0,
@@ -49,7 +50,7 @@ let globales = {
     initialSpaceX: 0, //utilizado para generar un espación y no sobreescribir el eje de ordenadas.
 
     zonaGrafX() {
-        return (this.width) - (this.marginLeft)
+        return (this.width) - (this.marginLeft) - (this.marginRight)
     },
     zonaGrafY() {
         return this.height - this.marginBottom - this.marginTop
@@ -71,7 +72,6 @@ const graficar = (dataset) => {
         const datasetMonthly = dataset.monthlyVariance; // array
 
         const where = document.querySelector("#grafico-contenedor")
-        tooltip = creatTooltip(where);
         svg = crearGraficoSVG(where)
         crearEscalas(datasetMonthly)
 
@@ -89,91 +89,82 @@ const graficar = (dataset) => {
         ***************************************************/
         createRectangulos(datasetMonthly)
 
+
         /**************************************************
         * Titulo
         ***************************************************/
-        const text = { title: "Graph title", subtitle: "This is the subtitle" }
-        createTitle(text)
-
+        svg
+            .append("text")
+            .attr("id", "title")
+            .attr("x", () => globales.width / 2 + "px")
+            .attr('text-anchor', 'middle') // Centra el elemento.
+            .attr("y", 6 + "%")
+            .text("Título")
+            .attr("style", "font-size: 1.45rem; fill: white; stroke: black;")
+        svg
+            .append("text")
+            .attr("id", "sub-title")
+            .attr("x", () => globales.width / 2 + "px")
+            .attr('text-anchor', 'middle') // Centra el elemento.
+            .attr("y", 11 + "%")
+            .text("Sub titulo")
+            .attr("style", "font-size: 1.05rem; fill: blue; text-decoration: underline")
 
         /**************************************************
         * Legend
         ***************************************************/
         const widthLegend = 0;
         const heightLegend = 0;
+        const positionLegendX = globales.width - widthLegend - globales.width * .02
+        const positionLegendY = globales.height / 2 - heightLegend / 2
+        const gapLegend = 25;
+        // recupera info de data cualitativa y el rango cromatico aplicado.
+        // console.log(colorScale.domain())
+        // console.log(colorScale.range())
         /*
-                // recupera info de data cualitativa y el rango cromatico aplicado.
-                // console.log(colorScale.domain())
-                // console.log(colorScale.range())
-                
-                        const legend = svg
-                            .append("g")
-                            .attr("id", "legend")
-                        // La posicion no se pude definir en el elemnto "g" de svg!!!
-                
-                        // legend.append("text")
-                        //     .attr("id", "LegendTitle")
-                        //     .attr("x", positionLegendX + "px")
-                        //     .attr("y", positionLegendY - gapLegend * 2 + "px")
-                        //     .text(`Legend`)
-                        //     .style("color", "blue")
-                        //     .style("font-size", "1.40rem")
-                        //     .style("font-weight", "bold")
-                        //     .style("text-anchor", "end")
-                        //     .style("font-style", "italic")
-                
-                        // svg.selectAll(".dotsLegend")
-                        //     .data(colorScale.domain())
-                        //     .enter()
-                        //     .append("circle")
-                        //     .attr("class", "dotsLegend")
-                        //     .attr("cx", () => positionLegendX)
-                        //     .attr("cy", (d, i) => positionLegendY - gapLegend * i)
-                        //     .attr("r", 7)
-                        //     .style("fill", function (d) { return colorScale(d) })
-                
-                        // svg.selectAll("labelLegend")
-                        //     .data(colorScale.domain())
-                        //     .enter()
-                        //     .append("text")
-                        //     .attr("class", "labelLegend")
-                        //     .attr("x", positionLegendX - 10)
-                        //     .attr("y", (d, i) => positionLegendY + 6 - (gapLegend) * i)
-                        //     .text(d => d ? "Doping Positive" : "Doping Negative")
-                        //     .style("text-anchor", "end")
-                        // // .style("font-style", "italic")
-                */
+                const legend = svg
+                    .append("g")
+                    .attr("id", "legend")
+                // La posicion no se pude definir en el elemnto "g" de svg!!!
+        
+                // legend.append("text")
+                //     .attr("id", "LegendTitle")
+                //     .attr("x", positionLegendX + "px")
+                //     .attr("y", positionLegendY - gapLegend * 2 + "px")
+                //     .text(`Legend`)
+                //     .style("color", "blue")
+                //     .style("font-size", "1.40rem")
+                //     .style("font-weight", "bold")
+                //     .style("text-anchor", "end")
+                //     .style("font-style", "italic")
+        
+                // svg.selectAll(".dotsLegend")
+                //     .data(colorScale.domain())
+                //     .enter()
+                //     .append("circle")
+                //     .attr("class", "dotsLegend")
+                //     .attr("cx", () => positionLegendX)
+                //     .attr("cy", (d, i) => positionLegendY - gapLegend * i)
+                //     .attr("r", 7)
+                //     .style("fill", function (d) { return colorScale(d) })
+        
+                // svg.selectAll("labelLegend")
+                //     .data(colorScale.domain())
+                //     .enter()
+                //     .append("text")
+                //     .attr("class", "labelLegend")
+                //     .attr("x", positionLegendX - 10)
+                //     .attr("y", (d, i) => positionLegendY + 6 - (gapLegend) * i)
+                //     .text(d => d ? "Doping Positive" : "Doping Negative")
+                //     .style("text-anchor", "end")
+                // // .style("font-style", "italic")
+        */
 
     } catch (error) {
         alert("Error: " + error)
     }
 }
 
-
-function createTitle({ title, subtitle }) {
-
-    const titlesGroup = svg.append("g")
-        .attr("id", "titlesGroupe")
-
-    titlesGroup
-        .append("text")
-        .attr("id", "title")
-        .attr("x", () => globales.width / 2 + "px")
-        .attr('text-anchor', 'middle') // Centra el elemento.
-        .attr("y", 6 + "%")
-        .text(title)
-        .attr("style", "font-size: 1.45rem; fill: white; stroke: black;")
-    titlesGroup
-        .append("text")
-        .attr("id", "sub-title")
-        .attr("x", () => globales.width / 2 + "px")
-        .attr('text-anchor', 'middle') // Centra el elemento.
-        .attr("y", 11 + "%")
-        .text(subtitle)
-        .attr("style", "font-size: 1.05rem; fill: blue; text-decoration: underline")
-
-
-}
 
 function crearGraficoSVG(elContenedor) {
     // Create SVG Element
@@ -186,11 +177,9 @@ function crearGraficoSVG(elContenedor) {
     return svg
 }
 
+
 function crearEscalas(datos) {
     // console.log(datos)
-
-    const axisGroup = svg.append("g")
-        .attr("id", "axisGroup")
 
     /************************************
      * X => Years
@@ -207,8 +196,8 @@ function crearEscalas(datos) {
         .tickFormat(d3.format('d')) // IMPOTANT Precision is ignored for integer formats (types b, o, d, x, and X) and character data (type c).
 
     // Add the x-axis.
-    axisGroup.append("g")
-        .attr("transform", `translate(1,${globales.height - globales.marginBottom - globales.marginTop + 2})`)
+    svg.append("g")
+        .attr("transform", `translate(0,${globales.height - globales.marginBottom})`)
         .style("fill", `white`)
         .attr("id", "x-axis")
         .call(xAxis)
@@ -231,7 +220,7 @@ function crearEscalas(datos) {
     */
     const yScale = d3.scaleBand()
         .domain([...y_rawData])
-        .range([globales.marginBottom, (globales.zonaGrafY())])
+        .range([globales.marginBottom, (globales.height - globales.marginBottom)])
 
     // Create the y-axis.
     const yAxis = d3.axisLeft()
@@ -245,53 +234,45 @@ function crearEscalas(datos) {
             return format;
         })
 
-    // Add the y-axis.
-    axisGroup.append("g")
-        .attr("transform", `translate(${globales.marginLeft - globales.initialSpaceX},2)`)
+    // Add the x-axis.
+    svg.append("g")
+        .attr("transform", `translate(${globales.marginLeft - globales.initialSpaceX},0)`)
         .style("fill", `white`)
         .attr("id", "y-axis")
         .call(yAxis)
 
     /************************************
      * Color => Temperarute
-     * ERRORES EN LA ESCALA-... si se complica mucho simplificar. Capaz Range a mano. 
     *************************************/
 
     // colorScaleDiscreto
     const temp_min = d3.min(datos, d => (d.variance + tempBase))
     const temp_max = d3.max(datos, d => (d.variance + tempBase))
 
-    const cantidadColores = 20
+    const cantidadColores = 16
 
-    const tempSegmentosRange = (temp_max - temp_min) / cantidadColores
-    console.log(temp_max, temp_min, temp_max - temp_min)
-    console.log(tempSegmentosRange)
+    const tempSegmentosRange = (temp_min + temp_max) / cantidadColores
+
+    // console.log(tempSegmentosRange)
 
     const tempDominio = []
     const tempRange = []
     let i = temp_min
-    const rangoMedio = .00
-    let contador = 0
+    const rangoMedio = .02
     while (i <= temp_max) { //se ejecuta si es true
         tempDominio.push(i)
 
         //Quise combinar 2 timpos de rangos de color... y un intermedio
         let color;
-
         if (i < (tempBase / (1 + rangoMedio))) {
-            color = d3.interpolateCool(((i) / (cantidadColores / 2)))
-            tempRange.push(color)
-            // tempRange.unshift(color)
+            color = d3.interpolateCool((i / cantidadColores))
         } else if ((i >= (tempBase / (1 + rangoMedio))) && (i <= (tempBase * (1 + rangoMedio)))) {
-            color = "white"
-            tempRange.push(color)
-        } else {
-            color = d3.interpolateOranges(((i) / (cantidadColores / 2)))
-            tempRange.push(color)
+            color = "yellow"
+        } else if (i > (tempBase * (1 + rangoMedio))) {
+            color = d3.interpolateOranges((i / cantidadColores))
         }
 
-        contador++
-        console.log(contador, i, (i / (cantidadColores / 2)), color)
+        tempRange.push(color)
 
         i += tempSegmentosRange
     }
@@ -343,6 +324,7 @@ function creatTooltip(contenedor) {
 
 }
 //inicia tooltip
+const tooltip = creatTooltip("#grafico-contenedor");
 
 function createRectangulos(datos) {
 
@@ -356,9 +338,9 @@ function createRectangulos(datos) {
     globales.rect.width = globales.zonaGrafX() / globales.rect.cantidadHorizontal
 
     //mejorar formula
-    globales.rect.height = (globales.zonaGrafY() - globales.marginBottom) / 12
+    globales.rect.height = (globales.zonaGrafY() - 20) / 12
 
-    const rectGroup = svg.append("g").attr("id", "rectGroup")
+    const rectGroup = svg.append("g").attr("id", "GrupoRectangulos")
 
     const rect = rectGroup.selectAll("rect")
         .data(datos)
@@ -374,7 +356,7 @@ function createRectangulos(datos) {
         .attr("x", d => xScale(d.year))
         .attr("y", (d, i) => {
             // console.log(d.month)
-            return (globales.rect.height * (d.month) + globales.marginTop)
+            return (globales.rect.height * (d.month)) - globales.marginTop + 10
         })
         .attr("fill", (d, i) => {
             const temp = d.variance + tempBase
@@ -435,7 +417,6 @@ function createRectangulos(datos) {
 
 function inicio() {
     try {
-        const lista = document.querySelector("section#datos > ol");
 
         fetch(url)
             .then(datos => datos.json())

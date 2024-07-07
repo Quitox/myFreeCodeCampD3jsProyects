@@ -97,7 +97,7 @@ const graficar = (dataset) => {
         // X => Min:Seg
         const yScale = d3.scaleTime()
             .domain([y_min, y_max])
-            .range([marginBottom, (height - marginBottom)]); // Pixels
+            .range([marginBottom, (height - marginBottom)]) // Pixels
 
         // Colors => Doping
         const dopingInfo = dataset.map(d => (d.Doping === "" ? false : true));
