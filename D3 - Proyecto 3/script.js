@@ -92,57 +92,9 @@ const graficar = (dataset) => {
         /**************************************************
         * Titulo
         ***************************************************/
-        const text = { title: "Graph title", subtitle: "This is the subtitle" }
+        //los años y la temp base se podrian haber agregado dinamicamente.
+        const text = { title: "Monthly Global Land-Surface Temperature", subtitle: `1753 - 2015: base temperature ${tempBase}℃` }
         createTitle(text)
-
-
-        /**************************************************
-        * Legend
-        ***************************************************/
-        const widthLegend = 0;
-        const heightLegend = 0;
-        /*
-                // recupera info de data cualitativa y el rango cromatico aplicado.
-                // console.log(colorScale.domain())
-                // console.log(colorScale.range())
-                
-                        const legend = svg
-                            .append("g")
-                            .attr("id", "legend")
-                        // La posicion no se pude definir en el elemnto "g" de svg!!!
-                
-                        // legend.append("text")
-                        //     .attr("id", "LegendTitle")
-                        //     .attr("x", positionLegendX + "px")
-                        //     .attr("y", positionLegendY - gapLegend * 2 + "px")
-                        //     .text(`Legend`)
-                        //     .style("color", "blue")
-                        //     .style("font-size", "1.40rem")
-                        //     .style("font-weight", "bold")
-                        //     .style("text-anchor", "end")
-                        //     .style("font-style", "italic")
-                
-                        // svg.selectAll(".dotsLegend")
-                        //     .data(colorScale.domain())
-                        //     .enter()
-                        //     .append("circle")
-                        //     .attr("class", "dotsLegend")
-                        //     .attr("cx", () => positionLegendX)
-                        //     .attr("cy", (d, i) => positionLegendY - gapLegend * i)
-                        //     .attr("r", 7)
-                        //     .style("fill", function (d) { return colorScale(d) })
-                
-                        // svg.selectAll("labelLegend")
-                        //     .data(colorScale.domain())
-                        //     .enter()
-                        //     .append("text")
-                        //     .attr("class", "labelLegend")
-                        //     .attr("x", positionLegendX - 10)
-                        //     .attr("y", (d, i) => positionLegendY + 6 - (gapLegend) * i)
-                        //     .text(d => d ? "Doping Positive" : "Doping Negative")
-                        //     .style("text-anchor", "end")
-                        // // .style("font-style", "italic")
-                */
 
     } catch (error) {
         alert("Error: " + error)
@@ -258,20 +210,23 @@ function crearEscalas(datos) {
     *************************************/
 
     // colorScaleDiscreto
+
     const temp_min = d3.min(datos, d => (d.variance + tempBase))
     const temp_max = d3.max(datos, d => (d.variance + tempBase))
 
-    const cantidadColores = 20
+    const cantidadColores = 15
 
     const tempSegmentosRange = (temp_max - temp_min) / cantidadColores
-    console.log(temp_max, temp_min, temp_max - temp_min)
-    console.log(tempSegmentosRange)
+    // console.log(temp_max, temp_min, temp_max - temp_min)
+    // console.log(tempSegmentosRange)
 
+    // Arma una escala combinada
+    let i = temp_min
     const tempDominio = []
     const tempRange = []
-    let i = temp_min
     const rangoMedio = .00
-    let contador = 0
+    // let contador = 0 // usar con el console.log
+    let rojo = 0 // incrementa el rojo un poco.
     while (i <= temp_max) { //se ejecuta si es true
         tempDominio.push(i)
 
@@ -279,32 +234,33 @@ function crearEscalas(datos) {
         let color;
 
         if (i < (tempBase / (1 + rangoMedio))) {
-            color = d3.interpolateCool(((i) / (cantidadColores / 2)))
-            tempRange.push(color)
+            color = d3.interpolateBlues(((i) / (cantidadColores / 2)))
+            tempRange.unshift(color)
             // tempRange.unshift(color)
         } else if ((i >= (tempBase / (1 + rangoMedio))) && (i <= (tempBase * (1 + rangoMedio)))) {
             color = "white"
             tempRange.push(color)
         } else {
-            color = d3.interpolateOranges(((i) / (cantidadColores / 2)))
+            rojo++
+            color = d3.interpolateOranges((((i + rojo) / 3) / (cantidadColores / 2)))
             tempRange.push(color)
         }
 
-        contador++
-        console.log(contador, i, (i / (cantidadColores / 2)), color)
+        // contador++
+        // console.log(contador, i, (i / (cantidadColores / 2)), color)
 
         i += tempSegmentosRange
     }
 
-    console.log(tempDominio)
-    console.log(tempRange)
+    // console.log(tempDominio)
+    // console.log(tempRange)
+
     /* Threshold scalesare similar to quantize scales, except they allow you to map arbitrary subsets of the domain to discrete values in the range. The input domain is still continuous,and divided into slices based on a set of threshold values. 
     https://d3js.org/d3-scale/threshold
     */
     // console.log(d3.schemeCategory10)
     // console.log(d3.interpolateRainbow(500)) ciclical
     // console.log(d3.interpolateOranges(x)) x= entre 0 y 1
-
     colorScaleDiscreto = d3.scaleThreshold()
         .domain([...tempDominio])
         .range(tempRange)
@@ -316,7 +272,6 @@ function crearEscalas(datos) {
     // console.log(colorScaleDiscreto(7.5))
     // console.log(colorScaleDiscreto(10))
     // console.log(colorScaleDiscreto(15))
-
 
     /* // colorScaleContinuo - No uso
     colorScaleContinuo = d3.scaleLinear()
@@ -331,6 +286,73 @@ function crearEscalas(datos) {
     console.log(colorScaleContinuo(10))
     console.log(colorScaleContinuo(15))
     */
+
+    /**************************************************
+    * Legend
+    ***************************************************/
+    CreateLegend(tempDominio)
+
+}
+
+function CreateLegend(tempDominio) {
+    // console.log(tempDominio.length)
+
+    const LegendGroup = svg.append("g").attr("id", "legend")
+
+
+    const colorBarGroup = LegendGroup.append("g").attr("id", "colorBarLegend")
+    const linesGroup = LegendGroup.append("g").attr("id", "linesLegend")
+    const numbersGroup = LegendGroup.append("g").attr("id", "numbersLegend")
+
+    // Legend - Barra de colores
+    colorBarGroup.selectAll("rect")
+        .data(tempDominio)
+        .enter()
+        .append("rect")
+        .attr("class", "legendRect")
+        .attr("width", 20)
+        .attr("height", 20)
+        .attr("x", (d, i) => (globales.width / 2) - (20 * tempDominio.length / 2) + 20 * i)
+        .attr("y", globales.height - globales.marginBottom / 2)
+        .attr("fill", d => colorScaleDiscreto(d))
+        .attr("strock", 1)
+    // .html((d, i) => { return `<strong>-${(i + 1)}-</strong>` }) // error aparece en DOM... No en pantalla
+
+    // Legend - Linea estética
+    linesGroup.append("circle")
+        .attr("r", 20)
+        .attr("cx", (globales.width / 2))
+        .attr("cy", globales.height - 0)
+        .attr("fill", "black")
+    linesGroup.append("line")
+        .attr("x1", (globales.width / 2) - (20 * tempDominio.length / 2) - 20)
+        .attr("x2", (globales.width / 2) - (20 * tempDominio.length / 2) + 20 * tempDominio.length + 20)
+        .attr("y1", globales.height - 5)
+        .attr("y2", globales.height - 5)
+        .attr("style", "stroke:black; stroke-width:10")
+    linesGroup.append("circle")
+        .attr("r", 15)
+        .attr("cx", (globales.width / 2))
+        .attr("cy", globales.height - 0)
+        .attr("fill", "white")
+
+    // Legend - Valores de los Grados °C
+    numbersGroup.selectAll("text")
+        .data(tempDominio)
+        .enter()
+        .append("text")
+        .text(d => Number.parseFloat(d).toFixed(1))
+        .attr("x", (d, i) => {
+            const espaciado = 1
+            return (globales.width / 2) - ((20 + espaciado) * tempDominio.length / 2) + (20 + espaciado) * i
+        })
+        .attr("y", globales.height - globales.marginBottom / 2 - 5)
+        .attr("class", "numbersLegend")
+
+    numbersGroup.append("text").text("°C")
+        .attr("x", ((globales.width / 2) - (tempDominio.length / 2) * 20) - 30)
+        .attr("y", globales.height - globales.marginBottom / 2 - 5)
+        .attr("id", "medidaLegend")
 }
 
 function creatTooltip(contenedor) {
@@ -342,7 +364,6 @@ function creatTooltip(contenedor) {
 
 
 }
-//inicia tooltip
 
 function createRectangulos(datos) {
 
@@ -358,17 +379,19 @@ function createRectangulos(datos) {
     //mejorar formula
     globales.rect.height = (globales.zonaGrafY() - globales.marginBottom) / 12
 
-    const rectGroup = svg.append("g").attr("id", "rectGroup")
+    const rectGroup = svg.append("g").attr("id", "description")
 
     const rect = rectGroup.selectAll("rect")
         .data(datos)
         .enter()
         .append("rect")
-        .attr("class", "rect cell")
-        .attr("data-month", d => d.month)
+        .attr("class", "cell rect")
+        .attr("data-month", d => {
+            //console.log(d.month - 1)
+            return d.month - 1
+        })
         .attr("data-year", d => d.year)
         .attr("data-temp", d => d.variance + tempBase)
-        .attr("class", "rect")
         .attr("width", globales.rect.width)
         .attr("height", globales.rect.height)
         .attr("x", d => xScale(d.year))
